@@ -9,7 +9,6 @@
                     :resourceName="resourceName"
                     :resourceId="resourceId"
                     :attribute="field.attribute"
-                    :previewStylesheet="field.enablePreview"
                 />
             </div>
         </template>
@@ -57,8 +56,7 @@ export default {
                 layout.title,
                 item.attributes,
                 this.field,
-                item.key,
-                layout.preview,
+                item.key
             );
         },
     }
