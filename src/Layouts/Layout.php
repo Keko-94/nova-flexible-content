@@ -3,6 +3,8 @@
 namespace Whitecube\NovaFlexibleContent\Layouts;
 
 use ArrayAccess;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Concerns\HasAttributes;
 use Illuminate\Database\Eloquent\Concerns\HidesAttributes;
@@ -385,6 +387,22 @@ class Layout implements LayoutInterface, JsonSerializable, ArrayAccess, Arrayabl
                 })
                 ->values()
                 ->all();
+    }
+
+    /**
+     * Force Fill the layout with an array of attributes.
+     *
+     * @param  array  $attributes
+     * @return $this
+     */
+    public function forceFill(array $attributes)
+    {
+        foreach ($attributes as $key => $value) {
+            $attribute = Str::replace('->', '.', $key);
+            Arr::set($this->attributes, $attribute, $value);
+        }
+
+        return $this;
     }
 
     /**
