@@ -73,6 +73,10 @@ class Flexible extends Field
         parent::__construct($name, $attribute, $resolveCallback);
 
         $this->button(__('Add layout'));
+        $this->duplicateOnCreate(false);
+        $this->preventDeletion(false);
+        $this->preventDrag(false);
+        $this->preventMove(false);
 
         // The original menu as default
         $this->menu('flexible-drop-menu');
@@ -99,6 +103,45 @@ class Flexible extends Field
     public function button($label)
     {
         return $this->withMeta(['button' => $label]);
+    }
+
+    /**
+     * Set the duplicate's behavior
+     *
+     * @return $this
+     */
+    public function duplicateOnCreate($value = true)
+    {
+        return $this->withMeta(['duplicateOnCreate' => $value]);
+    }
+
+    /**
+     * Remove group delete action
+     *
+     * @return $this
+     */
+    public function preventDeletion($value = true)
+    {
+        return $this->withMeta(['preventDeletion' => $value]);
+    }
+
+    /**
+     * Remove group delete action
+     *
+     * @return $this
+     */
+    public function preventDrag($value = true)
+    {
+        return $this->withMeta(['preventDrag' => $value]);
+    }
+    /**
+     * Remove group delete action
+     *
+     * @return $this
+     */
+    public function preventMove($value = true)
+    {
+        return $this->withMeta(['preventMove' => $value]);
     }
 
     /**
