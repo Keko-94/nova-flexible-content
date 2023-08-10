@@ -30,6 +30,7 @@
 
                     <div class="flex" v-if="!readonly">
                         <button
+                            v-if="!this.preventDrag"
                             dusk="drag-group"
                             type="button"
                             class="group-control btn border-l border-gray-200 dark:border-gray-700 w-8 h-8 block nova-flexible-content-drag-button"
@@ -38,6 +39,7 @@
                             <icon type="selector" class="align-top" width="16" height="16" />
                         </button>
                         <button
+                            v-if="!this.preventMove"
                             dusk="move-up-group"
                             type="button"
                             class="group-control btn border-l border-gray-200 dark:border-gray-700 w-8 h-8 block"
@@ -46,6 +48,7 @@
                             <icon type="arrow-up" class="align-top" width="16" height="16" />
                         </button>
                         <button
+                            v-if="!this.preventMove"
                             dusk="move-down-group"
                             type="button"
                             class="group-control btn border-l border-gray-200 dark:border-gray-700 w-8 h-8 block"
@@ -54,6 +57,7 @@
                             <icon type="arrow-down" class="align-top" width="16" height="16" />
                         </button>
                         <button
+                            v-if="!this.preventDeletion"
                             dusk="delete-group"
                             type="button"
                             class="group-control btn border-l border-gray-200 dark:border-gray-700 w-8 h-8 block"
@@ -92,12 +96,9 @@
 </template>
 
 <script>
-import BehavesAsPanel from 'nova-mixins/BehavesAsPanel';
 import { mapProps } from 'laravel-nova';
 
 export default {
-    mixins: [BehavesAsPanel],
-
     props: {
         errors: {},
         group: {},
@@ -113,6 +114,9 @@ export default {
             removeMessage: false,
             collapsed: this.group.collapsed,
             readonly: this.group.readonly,
+            preventDeletion: this.field.preventDeletion,
+            preventDrag: this.field.preventDrag,
+            preventMove: this.field.preventMove
         };
     },
 
