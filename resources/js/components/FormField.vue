@@ -99,7 +99,8 @@ export default {
             order: [],
             groups: {},
             files: {},
-            sortableInstance: null
+            sortableInstance: null,
+            fieldsDuplication: null
         };
     },
 
@@ -177,7 +178,6 @@ export default {
         handleChange(value) {
             this.value = value || [];
             this.files = {};
-
             this.populateGroups();
         },
 
@@ -213,6 +213,32 @@ export default {
             if(!layout) return;
 
             collapsed = collapsed || false;
+
+            if (this.field.duplicateOnCreate) {
+                if (attributes && this.fieldsDuplication === null) {
+                    let cleanAttributes = function (attributes) {
+                        attributes.forEach((element, index, array) => {
+                            element.attribute = element.attribute.split('__')[1] ?? element.attribute;
+                            element.validationKey = element.validationKey.split('__')[1] ?? element.validationKey;
+
+                            if (element.component === 'nova-flexible-content') {
+                                element.value.forEach((value, index, array) => {
+                                    array[index].attributes = cleanAttributes(value.attributes);
+                                });
+                            }
+
+                            array[index] = element;
+                        });
+
+                        return attributes;
+                    }
+                    this.fieldsDuplication = cleanAttributes(JSON.parse(JSON.stringify(attributes)));
+                }
+
+                if (attributes === undefined && this.fieldsDuplication !== null) {
+                    attributes = this.fieldsDuplication;
+                }
+            }
 
             let fields = attributes || JSON.parse(JSON.stringify(layout.fields)),
                 group = new Group(layout.name, layout.title, fields, this.currentField, key, collapsed);
