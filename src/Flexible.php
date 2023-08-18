@@ -2,10 +2,14 @@
 
 namespace Whitecube\NovaFlexibleContent;
 
+use Formfeed\Subfields\Subfield;
 use Illuminate\Support\Collection;
 use Laravel\Nova\Fields\Field;
+use Laravel\Nova\Fields\FieldCollection;
+use Laravel\Nova\Fields\File;
 use Laravel\Nova\Fields\SupportsDependentFields;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Nova;
 use Whitecube\NovaFlexibleContent\Http\ScopedRequest;
 use Whitecube\NovaFlexibleContent\Layouts\Collection as LayoutsCollection;
 use Whitecube\NovaFlexibleContent\Layouts\Layout;
@@ -82,6 +86,35 @@ class Flexible extends Field
         $this->menu('flexible-drop-menu');
 
         $this->hideFromIndex();
+    }
+
+    public function hasSubfields(NovaRequest$request): bool
+    {
+        $resource_name = $request->route('resource');
+        if ($resource_name) {
+            $resource = Nova::resourceInstanceForKey($resource_name);
+            if ($resource)
+                return method_exists($resource, "hasSubfields") && $resource->hasSubfields($request);
+        }
+        
+        return false;
+    }
+
+    public function getSubfields(NovaRequest$request): FieldCollection
+    {
+        $resource_name = $request->route('resource');
+        if ($resource_name) {
+            $resource = Nova::resourceInstanceForKey($resource_name);
+            if ($resource)
+                return $resource->getSubfields($request);
+        }
+        
+        return FieldCollection::make([]);
+    }
+
+    public function afterDependsOnSync() : self
+    {
+        return $this;
     }
 
     /**
