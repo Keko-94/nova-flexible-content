@@ -572,7 +572,7 @@ class Flexible extends Field
      */
     protected function newGroup($layout, $key)
     {
-        $layout = $this->layouts->find($layout);
+        $layout = $this->layouts?->find($layout);
 
         if (! $layout instanceof Layout) {
             return null;
