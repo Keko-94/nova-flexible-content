@@ -89,6 +89,7 @@
                     :mode="mode"
                     :show-help-text="item.helpText != null"
                     :class="{ 'remove-bottom-border': index == group.fields.length - 1 }"
+                    @field-changed="handleFieldChange"
                 />
             </div>
         </div>
@@ -191,6 +192,13 @@ export default {
          */
         collapse() {
             this.collapsed = true;
+        },
+
+        /**
+         * Handle field change events and propagate to parent
+         */
+        handleFieldChange() {
+            this.$emit('field-changed');
         }
     },
 }
