@@ -18,7 +18,18 @@ export default class Group {
         let formData = new FormData();
 
         for (var i = 0; i < this.fields.length; i++) {
-            this.fields[i].fill(formData);
+            // Les champs sont des objets de configuration, pas des composants Vue
+            // On ne peut pas appeler .fill() directement sur eux
+            // Cette méthode devrait être implémentée différemment selon le contexte
+            if (typeof this.fields[i].fill === 'function') {
+                this.fields[i].fill(formData);
+            } else {
+                // Pour les champs de configuration, on peut ajouter leurs valeurs manuellement
+                // si elles existent
+                if (this.fields[i].value !== undefined) {
+                    formData.set(this.fields[i].attribute, this.fields[i].value);
+                }
+            }
         }
 
         return formData;
