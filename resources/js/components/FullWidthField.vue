@@ -1,10 +1,12 @@
 <template>
-    <field-wrapper>
-        <div class="py-6 px-8 w-full">
-            <div class="mb-6" v-if="fieldLabel">
-                <form-label :for="field.attribute" :class="{
-                      'mb-2': field.helpText && showHelpText
-                  }">
+    <field-wrapper :stacked="true">
+        <div class="py-3 px-8 w-full">
+            <div class="mb-2" v-if="fieldLabel">
+                <form-label
+                    :for="field.attribute"
+                    class="block"
+                    :class="{ 'mb-1': field.helpText && showHelpText }"
+                >
                     {{ fieldLabel }}
 
                     <span v-if="field.required" class="text-danger text-sm">{{
@@ -12,7 +14,7 @@
                     }}</span>
                 </form-label>
 
-                <help-text v-if="showHelpText">
+                <help-text v-if="showHelpText" class="mt-0">
                     {{ field.helpText }}
                 </help-text>
             </div>
