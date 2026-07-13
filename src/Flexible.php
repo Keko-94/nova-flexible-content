@@ -196,7 +196,10 @@ class Flexible extends Field
      */
     public function stacked()
     {
-        return $this->fullWidth();
+        return $this->withMeta([
+            'fullWidth' => true,
+            'stacked' => true,
+        ]);
     }
 
     /**
