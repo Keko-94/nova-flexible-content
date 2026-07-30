@@ -22,3 +22,23 @@ $multiselect-placeholder-color: #7c858e;
 .dark .nova-flexible-content-sortable-drag {
   background-color: rgba(var(--colors-gray-900),var(--tw-bg-opacity));
 }
+
+.nova-flexible-add-button-disabled {
+  cursor: not-allowed;
+}
+
+.nova-flexible-add-button.is-readonly,
+.nova-flexible-add-button.is-readonly:hover,
+.nova-flexible-add-button.is-readonly:focus,
+.nova-flexible-add-button.is-readonly:active,
+.nova-flexible-add-button-disabled .nova-flexible-add-button,
+.nova-flexible-add-button-disabled .nova-flexible-add-button:hover,
+.nova-flexible-add-button-disabled .nova-flexible-add-button:focus,
+.nova-flexible-add-button-disabled .nova-flexible-add-button:active {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+  pointer-events: none;
+}
