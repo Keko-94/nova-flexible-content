@@ -337,7 +337,65 @@ class Flexible extends Field
 
         $this->buildGroups($resource, $attribute);
 
+        if ($this->shouldApplyReadonly()) {
+            $this->applyReadonlyState();
+        }
+
         $this->value = $this->resolveGroups($this->groups);
+    }
+
+    /**
+     * Determine whether the flexible field should currently behave as readonly.
+     */
+    protected function shouldApplyReadonly(): bool
+    {
+        try {
+            return $this->isReadonly(app(NovaRequest::class));
+        } catch (\Throwable $e) {
+            return $this->readonlyCallback === true;
+        }
+    }
+
+    /**
+     * Lock the flexible structure and propagate readonly to nested fields.
+     */
+    public function applyReadonlyState(): self
+    {
+        $this->preventDeletion();
+        $this->preventDrag();
+        $this->preventMove();
+
+        if ($this->layouts) {
+            $this->layouts->each(function ($layout) {
+                $this->makeLayoutFieldsReadonly($layout);
+            });
+        }
+
+        if ($this->groups) {
+            $this->groups->each(function ($group) {
+                $this->makeLayoutFieldsReadonly($group);
+            });
+        }
+
+        return $this;
+    }
+
+    /**
+     * Mark every field inside a layout/group as readonly.
+     */
+    protected function makeLayoutFieldsReadonly(LayoutInterface $layout): void
+    {
+        foreach ($layout->fields() as $field) {
+            if (! ($field instanceof Field)) {
+                continue;
+            }
+
+            $field->readonly();
+
+            if ($field instanceof self) {
+                $field->applyReadonlyState();
+            }
+        }
     }
 
     /**
@@ -385,6 +443,10 @@ class Flexible extends Field
      */
     protected function fillAttribute(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
+        if ($this->isReadonly($request)) {
+            return;
+        }
+
         if (! $request->exists($requestAttribute)) {
             return;
         }
