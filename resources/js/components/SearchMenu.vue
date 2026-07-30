@@ -1,17 +1,26 @@
 <template>
     <div class="w-3/5" v-if="layouts">
-        <div v-if="this.limitCounter > 0 || this.limitCounter === null">
-            <div v-if="layouts.length === 1">
-                <default-button
-                    dusk="toggle-layouts-dropdown-or-add-default"
-                    type="button"
-                    tabindex="0"
-                    @click="toggleLayoutsDropdownOrAddDefault"
+        <div v-if="field.readonly || this.limitCounter > 0 || this.limitCounter === null">
+            <div v-if="layouts.length === 1 || field.readonly">
+                <span
+                    class="inline-block"
+                    :class="{ 'nova-flexible-add-button-disabled': field.readonly }"
                 >
-                    <span>{{ field.button }}</span>
-                </default-button>
+                    <default-button
+                        dusk="toggle-layouts-dropdown-or-add-default"
+                        type="button"
+                        :tabindex="field.readonly ? -1 : 0"
+                        class="nova-flexible-add-button"
+                        :class="{ 'is-readonly': field.readonly }"
+                        :disabled="field.readonly"
+                        :aria-disabled="field.readonly ? 'true' : 'false'"
+                        @click="toggleLayoutsDropdownOrAddDefault"
+                    >
+                        <span>{{ field.button }}</span>
+                    </default-button>
+                </span>
             </div>
-            <div v-if="layouts.length > 1">
+            <div v-else-if="layouts.length > 1">
                 <div style="min-width: 300px;">
                     <div class="flexible-search-menu-multiselect">
                         <Multiselect
@@ -73,6 +82,8 @@
 
         methods: {
             selectLayout(layoutName){
+                if (this.field.readonly) return;
+
                 let layout = this.layouts.find(layout => layout.name === layoutName);
                 this.addGroup(layout);
             },
@@ -82,6 +93,10 @@
              * or directly add the only available layout.
              */
             toggleLayoutsDropdownOrAddDefault(event) {
+                if (this.field.readonly) {
+                    return;
+                }
+
                 if (this.layouts.length === 1) {
                     return this.addGroup(this.layouts[0]);
                 }
@@ -93,7 +108,7 @@
              * Append the given layout to flexible content's list
              */
             addGroup(layout) {
-                if (!layout) return;
+                if (!layout || this.field.readonly) return;
 
                 this.$emit('addGroup', layout);
 
