@@ -114,7 +114,7 @@ export default {
         return {
             removeMessage: false,
             collapsed: this.group.collapsed,
-            readonly: this.group.readonly,
+            readonly: this.group.readonly || this.field.readonly,
             preventDeletion: this.field.preventDeletion,
             preventDrag: this.field.preventDrag,
             preventMove: this.field.preventMove
