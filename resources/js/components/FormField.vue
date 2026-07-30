@@ -281,6 +281,12 @@ export default {
     addGroup(layout, attributes, key, collapsed) {
       if(!layout) return;
 
+      // Structural changes are forbidden while the flexible field is readonly,
+      // except when hydrating existing groups from the field value.
+      if (this.currentField.readonly && typeof attributes === 'undefined' && typeof key === 'undefined') {
+        return;
+      }
+
       collapsed = collapsed || false;
 
       let cleanAttributes = function (attributes) {
@@ -497,6 +503,8 @@ export default {
      * Move a group up
      */
     moveUp(key) {
+      if (this.currentField.readonly) return;
+
       let index = this.order.indexOf(key);
 
       if(index <= 0) return;
@@ -508,6 +516,8 @@ export default {
      * Move a group down
      */
     moveDown(key) {
+      if (this.currentField.readonly) return;
+
       let index = this.order.indexOf(key);
 
       if(index < 0 || index >= this.order.length - 1) return;
@@ -519,6 +529,8 @@ export default {
      * Remove a group
      */
     remove(key) {
+      if (this.currentField.readonly) return;
+
       let index = this.order.indexOf(key);
 
       if(index < 0) return;
@@ -531,7 +543,7 @@ export default {
     initSortable() {
       const containerRef = this.$refs['flexibleFieldContainer']
 
-      if (! containerRef || this.sortableInstance) {
+      if (! containerRef || this.sortableInstance || this.currentField.readonly) {
         return;
       }
 
