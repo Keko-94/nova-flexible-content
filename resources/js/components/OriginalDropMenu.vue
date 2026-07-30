@@ -1,6 +1,6 @@
 <template>
     <div class="relative" v-if="layouts">
-        <div v-if="isLayoutsDropdownOpen && layouts.length > 1"
+        <div v-if="!field.readonly && isLayoutsDropdownOpen && layouts.length > 1"
                 ref="dropdown"
                 class="z-20 absolute rounded-lg shadow-lg max-w-full max-h-search overflow-y-auto border border-40"
                 v-bind:class="dropdownClasses"
@@ -16,16 +16,25 @@
                 </li>
             </ul>
         </div>
-        <default-button
-            dusk="toggle-layouts-dropdown-or-add-default"
-            type="button"
-            tabindex="0"
-            ref="dropdownButton"
-            @click="toggleLayoutsDropdownOrAddDefault"
-            v-if="isBelowLayoutLimits"
+        <span
+            v-if="shouldShowButton"
+            class="inline-block"
+            :class="{ 'nova-flexible-add-button-disabled': isAddDisabled }"
         >
-            <span>{{ field.button }}</span>
-        </default-button>
+            <default-button
+                dusk="toggle-layouts-dropdown-or-add-default"
+                type="button"
+                :tabindex="isAddDisabled ? -1 : 0"
+                ref="dropdownButton"
+                class="nova-flexible-add-button"
+                :class="{ 'is-readonly': isAddDisabled }"
+                :disabled="isAddDisabled"
+                :aria-disabled="isAddDisabled ? 'true' : 'false'"
+                @click="toggleLayoutsDropdownOrAddDefault"
+            >
+                <span>{{ field.button }}</span>
+            </default-button>
+        </span>
     </div>
 </template>
 
@@ -53,7 +62,16 @@
             },
 
             isBelowLayoutLimits() {
-                return (this.limitCounter > 0 || this.limitCounter === null) && this.filteredLayouts.length > 0;
+                return (this.limitCounter > 0 || this.limitCounter === null)
+                    && this.filteredLayouts.length > 0;
+            },
+
+            shouldShowButton() {
+                return this.field.readonly || this.isBelowLayoutLimits;
+            },
+
+            isAddDisabled() {
+                return Boolean(this.field.readonly) || !this.isBelowLayoutLimits;
             },
 
             dropdownClasses() {
@@ -72,6 +90,10 @@
              * or directly add the only available layout.
              */
             toggleLayoutsDropdownOrAddDefault(event) {
+                if (this.isAddDisabled) {
+                    return;
+                }
+
                 if (this.layouts.length === 1) {
                     return this.addGroup(this.layouts[0]);
                 }
@@ -97,7 +119,7 @@
              * Append the given layout to flexible content's list
              */
             addGroup(layout) {
-                if (!layout) return;
+                if (!layout || this.field.readonly) return;
 
                 this.$emit('addGroup', layout);
                 Nova.$emit('nova-flexible-content-add-group', layout);
