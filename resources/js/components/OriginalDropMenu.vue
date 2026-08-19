@@ -52,6 +52,20 @@
             };
         },
 
+        watch: {
+            isLayoutsDropdownOpen(isOpen) {
+                if (isOpen) {
+                    this.bindOutsideListeners();
+                } else {
+                    this.unbindOutsideListeners();
+                }
+            },
+        },
+
+        beforeUnmount() {
+            this.unbindOutsideListeners();
+        },
+
         computed: {
             filteredLayouts() {
                 return this.layouts.filter(layout => {
@@ -85,6 +99,45 @@
         },
 
         methods: {
+            bindOutsideListeners() {
+                this.unbindOutsideListeners();
+
+                this.$nextTick(() => {
+                    document.addEventListener('mousedown', this.handleClickOutside);
+                    document.addEventListener('keydown', this.handleEscape);
+                });
+            },
+
+            unbindOutsideListeners() {
+                document.removeEventListener('mousedown', this.handleClickOutside);
+                document.removeEventListener('keydown', this.handleEscape);
+            },
+
+            handleClickOutside(event) {
+                if (!this.isLayoutsDropdownOpen) {
+                    return;
+                }
+
+                const root = this.$el;
+
+                if (root && root.contains(event.target)) {
+                    return;
+                }
+
+                this.closeLayoutsDropdown();
+            },
+
+            handleEscape(event) {
+                if (event.key === 'Escape' && this.isLayoutsDropdownOpen) {
+                    this.closeLayoutsDropdown();
+                }
+            },
+
+            closeLayoutsDropdown() {
+                this.isLayoutsDropdownOpen = false;
+                this.dropdownOrientation = 'bottom';
+            },
+
             /**
              * Display or hide the layouts choice dropdown if there are multiple layouts
              * or directly add the only available layout.
@@ -101,15 +154,14 @@
                 this.isLayoutsDropdownOpen = !this.isLayoutsDropdownOpen;
 
                 this.$nextTick(() => {
-                    if (this.isLayoutsDropdownOpen) {
+                    if (this.isLayoutsDropdownOpen && this.$refs.dropdown) {
                         const { bottom: dropdownBottom } = this.$refs.dropdown.getBoundingClientRect();
 
                         // If the dropdown is popping out of the bottom of the window, pin it to the top of the button.
                         if (dropdownBottom > window.innerHeight) {
                             this.dropdownOrientation = 'top';
                         }
-                    } else {
-                        // Reset the orientation.
+                    } else if (!this.isLayoutsDropdownOpen) {
                         this.dropdownOrientation = 'bottom';
                     }
                 });
@@ -124,10 +176,7 @@
                 this.$emit('addGroup', layout);
                 Nova.$emit('nova-flexible-content-add-group', layout);
 
-                this.isLayoutsDropdownOpen = false;
-
-                // Reset the orientation.
-                this.dropdownOrientation = 'top';
+                this.closeLayoutsDropdown();
             },
         }
     }
