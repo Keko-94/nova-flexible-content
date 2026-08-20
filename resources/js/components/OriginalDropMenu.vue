@@ -18,6 +18,7 @@
         </div>
         <span
             v-if="shouldShowButton"
+            ref="dropdownButton"
             class="inline-block"
             :class="{ 'nova-flexible-add-button-disabled': isAddDisabled }"
         >
@@ -25,7 +26,6 @@
                 dusk="toggle-layouts-dropdown-or-add-default"
                 type="button"
                 :tabindex="isAddDisabled ? -1 : 0"
-                ref="dropdownButton"
                 class="nova-flexible-add-button"
                 :class="{ 'is-readonly': isAddDisabled }"
                 :disabled="isAddDisabled"
@@ -118,9 +118,14 @@
                     return;
                 }
 
-                const root = this.$el;
+                const dropdown = this.$refs.dropdown;
+                const button = this.$refs.dropdownButton;
 
-                if (root && root.contains(event.target)) {
+                if (dropdown && dropdown.contains(event.target)) {
+                    return;
+                }
+
+                if (button && button.contains(event.target)) {
                     return;
                 }
 
